@@ -1,23 +1,12 @@
-const path = require('path');
+const withTM = require('next-transpile-modules')(['shared']);
 
-module.exports = {
+module.exports = withTM({
     experimental: {
         modern: true,
         polyfillsOptimization: true
     },
   
     webpack(config, { dev, isServer }) {
-        const aliases = config.resolve.alias || (config.resolve.alias = {});
-        aliases.react = aliases['react-dom'] = 'preact/compat';
-
-        // This is the shared folder that I wanna alias
-        aliases.shared = path.resolve(__dirname, '..', 'shared');
-        
-        const reg = /shared/;
-        const babel = config.module.rules[0];
-        babel.include.push(reg);
-        babel.exclude = [f => !reg.test(f)].concat(babel.exclude);
-
         const splitChunks = config.optimization && config.optimization.splitChunks
         if (splitChunks) {
             const cacheGroups = splitChunks.cacheGroups;
@@ -47,4 +36,4 @@ module.exports = {
     
         return config;
     }
-  };
+  });
